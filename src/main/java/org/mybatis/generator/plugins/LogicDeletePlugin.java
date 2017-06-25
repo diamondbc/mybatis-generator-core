@@ -163,7 +163,7 @@ public class LogicDeletePlugin extends PluginAdapter {
      */
     private XmlElement initIfDeleteElement() {
         XmlElement deleteElement = new XmlElement("if");
-        deleteElement.addAttribute(new Attribute("test", "1=1"));
+        deleteElement.addAttribute(new Attribute("test", "oredCriteria != null and oredCriteria.size() > 0"));
         deleteElement.addElement(new TextElement("and " + deleteKey + " = " + existValue));
         return deleteElement;
     }
