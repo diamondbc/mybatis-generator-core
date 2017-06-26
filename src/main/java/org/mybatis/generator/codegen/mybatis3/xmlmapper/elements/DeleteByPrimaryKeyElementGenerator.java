@@ -89,6 +89,5 @@ public class DeleteByPrimaryKeyElementGenerator extends
                         introspectedTable)) {
             parentElement.addElement(answer);
         }
-        System.out.println(123);
     }
 }
