@@ -21,10 +21,10 @@ import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 
 /**
- * The Class DefaultCommentGenerator.
+ * MyCommentGenerator
  *
  */
-public class DGCommentGenerator extends DefaultCommentGenerator {
+public class MyCommentGenerator extends DefaultCommentGenerator {
 
 
 
