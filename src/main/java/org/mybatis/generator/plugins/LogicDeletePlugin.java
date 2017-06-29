@@ -18,7 +18,6 @@ public class LogicDeletePlugin extends PluginAdapter {
     private String deleteValue;
     private String existValue;
 
-
     public LogicDeletePlugin() {
         super();
         deleteKey = properties.get("deleteKey") != null ? properties.get("deleteKey").toString() : "is_deleted";
@@ -26,22 +25,18 @@ public class LogicDeletePlugin extends PluginAdapter {
         existValue = properties.get("existValue") != null ? properties.get("existValue").toString() : "0";
     }
 
-
     @Override
     public boolean sqlMapExampleWhereClauseElementGenerated(XmlElement element, IntrospectedTable introspectedTable) {
         XmlElement whereElement = (XmlElement) element.getElements().get(element.getElements().size() - 1);
-        whereElement.addElement(initIfDeleteElement());
+        whereElement.addElement(initCriteriaDeleteElement());
         return super.sqlMapExampleWhereClauseElementGenerated(element, introspectedTable);
     }
-
 
     @Override
     public boolean sqlMapSelectByPrimaryKeyElementGenerated(XmlElement element, IntrospectedTable introspectedTable) {
         element.addElement(initDeleteElement());
         return super.sqlMapSelectByPrimaryKeyElementGenerated(element, introspectedTable);
     }
-
-
 
     @Override
     public boolean sqlMapUpdateByPrimaryKeySelectiveElementGenerated(XmlElement element,
@@ -50,8 +45,6 @@ public class LogicDeletePlugin extends PluginAdapter {
         return super.sqlMapUpdateByPrimaryKeySelectiveElementGenerated(element, introspectedTable);
     }
 
-
-
     @Override
     public boolean sqlMapUpdateByPrimaryKeyWithoutBLOBsElementGenerated(XmlElement element,
                     IntrospectedTable introspectedTable) {
@@ -59,14 +52,11 @@ public class LogicDeletePlugin extends PluginAdapter {
         return super.sqlMapUpdateByPrimaryKeyWithoutBLOBsElementGenerated(element, introspectedTable);
     }
 
-
-
     @Override
     public boolean sqlMapSelectAllElementGenerated(XmlElement element, IntrospectedTable introspectedTable) {
         element.addElement(initDeleteElement());
         return super.sqlMapSelectAllElementGenerated(element, introspectedTable);
     }
-
 
     /**
      * 主键删除
@@ -87,15 +77,11 @@ public class LogicDeletePlugin extends PluginAdapter {
             }
         }
         element.addAttribute(new Attribute("parameterType", parameterClass));
-        // 去除注释
-        // context.getCommentGenerator().addComment(element);
-
         StringBuilder sb = new StringBuilder();
         sb.append("update ");
         sb.append(introspectedTable.getFullyQualifiedTableNameAtRuntime());
         sb.append(" set " + deleteKey + " = " + deleteValue);
         element.addElement(new TextElement(sb.toString()));
-
         boolean and = false;
         for (IntrospectedColumn introspectedColumn : introspectedTable.getPrimaryKeyColumns()) {
             sb.setLength(0);
@@ -105,7 +91,6 @@ public class LogicDeletePlugin extends PluginAdapter {
                 sb.append("where ");
                 and = true;
             }
-
             sb.append(MyBatis3FormattingUtilities.getEscapedColumnName(introspectedColumn));
             sb.append(" = ");
             sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn));
@@ -124,8 +109,6 @@ public class LogicDeletePlugin extends PluginAdapter {
         String fqjt = introspectedTable.getExampleType();
         element.addAttribute(new Attribute("id", introspectedTable.getDeleteByExampleStatementId()));
         element.addAttribute(new Attribute("parameterType", fqjt));
-        // 去除注释
-        // context.getCommentGenerator().addComment(element);
         StringBuilder sb = new StringBuilder();
         sb.append("update ");
         sb.append(introspectedTable.getFullyQualifiedTableNameAtRuntime());
@@ -135,8 +118,6 @@ public class LogicDeletePlugin extends PluginAdapter {
         return super.sqlMapDeleteByPrimaryKeyElementGenerated(element, introspectedTable);
     }
 
-
-
     @Override
     public boolean validate(List<String> warnings) {
         return true;
@@ -145,7 +126,6 @@ public class LogicDeletePlugin extends PluginAdapter {
     protected XmlElement getExampleIncludeElement(IntrospectedTable introspectedTable) {
         XmlElement ifElement = new XmlElement("if");
         ifElement.addAttribute(new Attribute("test", "_parameter != null"));
-
         XmlElement includeElement = new XmlElement("include");
         includeElement.addAttribute(new Attribute("refid", introspectedTable.getExampleWhereClauseId()));
         ifElement.addElement(includeElement);
@@ -161,7 +141,7 @@ public class LogicDeletePlugin extends PluginAdapter {
      * @return： XmlElement
      * @throws
      */
-    private XmlElement initIfDeleteElement() {
+    private XmlElement initCriteriaDeleteElement() {
         XmlElement deleteElement = new XmlElement("if");
         deleteElement.addAttribute(new Attribute("test", "oredCriteria != null and oredCriteria.size() > 0"));
         deleteElement.addElement(new TextElement("and " + deleteKey + " = " + existValue));

@@ -23,21 +23,28 @@ public class PaginationPlugin extends PluginAdapter {
     private String offset;
     private String limit;
 
-
     public PaginationPlugin() {
         super();
         offset = properties.get("offset") != null ? properties.get("offset").toString() : "offset";
         limit = properties.get("limit") != null ? properties.get("limit").toString() : "limit";
-        
     }
 
     @Override
     public boolean modelExampleClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        // add field, getter, setter,constructor for limit clause
         addConstructor(topLevelClass, introspectedTable);
         addLimit(topLevelClass, introspectedTable, offset);
         addLimit(topLevelClass, introspectedTable, limit);
         return super.modelExampleClassGenerated(topLevelClass, introspectedTable);
+    }
+
+    @Override
+    public boolean sqlMapSelectByExampleWithoutBLOBsElementGenerated(XmlElement element,
+                    IntrospectedTable introspectedTable) {
+        XmlElement isNotNullElement = new XmlElement("if"); //
+        isNotNullElement.addAttribute(new Attribute("test", limit + " != null and " + offset + " != null"));
+        isNotNullElement.addElement(new TextElement("limit #{" + offset + "} , #{" + limit + "}"));
+        element.addElement(isNotNullElement);
+        return super.sqlMapSelectByExampleWithoutBLOBsElementGenerated(element, introspectedTable);
     }
 
     /**
@@ -61,24 +68,12 @@ public class PaginationPlugin extends PluginAdapter {
         topLevelClass.addMethod(method);
     }
 
-    @Override
-    public boolean sqlMapSelectByExampleWithoutBLOBsElementGenerated(XmlElement element,
-                    IntrospectedTable introspectedTable) {
-        XmlElement isNotNullElement = new XmlElement("if"); //
-        isNotNullElement.addAttribute(new Attribute("test", limit + " != null and " + limit + " >= 0"));  
-        isNotNullElement.addElement(new TextElement("limit #{" + offset + "} , #{" + limit + "}"));
-        element.addElement(isNotNullElement);
-        return super.sqlMapSelectByExampleWithoutBLOBsElementGenerated(element, introspectedTable);
-    }
-
     private void addLimit(TopLevelClass topLevelClass, IntrospectedTable introspectedTable, String name) {
         CommentGenerator commentGenerator = context.getCommentGenerator();
         Field field = new Field();
         field.setVisibility(JavaVisibility.PROTECTED);
-        // field.setType(FullyQualifiedJavaType.getIntInstance());
         field.setType(PrimitiveTypeWrapper.getIntegerInstance());
         field.setName(name);
-        // field.setInitializationString("-1");
         commentGenerator.addFieldComment(field, introspectedTable);
         topLevelClass.addField(field);
         char c = name.charAt(0);
