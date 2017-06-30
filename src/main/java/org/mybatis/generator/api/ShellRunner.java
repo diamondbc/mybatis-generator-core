@@ -51,6 +51,11 @@ public class ShellRunner {
     private static final String HELP_2 = "-h"; //
 
     public static void main(String[] args) {
+        args=new String[]{"-configfile","","-overwrite"};
+        main2(args);
+    }
+    
+    public static void main2(String[] args) {
         if (args.length == 0) {
             usage();
             System.exit(0);
